@@ -111,22 +111,22 @@ Each stage is planned to help new trainees focus on specific tasks and concepts.
 ---
 
 ## Folder Structure
-```
+```bash
 src/
   components/
-    Question.jsx
-    Option.jsx
-    QuizSummary.jsx
-    CodeSnippet.jsx
+    questions/
+      Question.jsx         # Renders question text and delegates option rendering
+      Option.jsx           # Represents individual answer options (single/multiple selection)
+      CodeSnippet.jsx      # Renders code blocks with syntax highlighting
+    results/
+      QuizSummary.jsx      # Displays user's performance, correct answers, and score summary
   data/
-    questions.json (if using local data initially)
+    questions.json         # Local fallback question set for development/testing purposes
   services/
-    api.js (for calling Spring Boot APIs)
-  App.jsx
-  main.jsx
+    api.js                 # Encapsulates API calls to the Spring Boot backend
+  App.jsx                  # Root component of the app; sets up routes and high-level state
+  main.jsx                 # Entry point for React DOM rendering and Vite bootstrap
 ```
-
----
 
 ## Skills Covered
 - React Functional Components with .jsx extension

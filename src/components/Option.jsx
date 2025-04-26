@@ -6,6 +6,7 @@ function Option({ text, isSelected, onClick, showResult, isCorrect }) {
     if (showResult) {
       if (isSelected && isCorrect) resultStyle = "bg-green-200 border-green-500"
       else if (isSelected && !isCorrect) resultStyle = "bg-red-200 border-red-500"
+      else if (!isSelected && isCorrect) resultStyle = "bg-yellow-200 border-yellow-500" // missed correct option
     }
   
     return (

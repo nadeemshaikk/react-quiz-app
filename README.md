@@ -148,4 +148,3 @@ This project can be used as a group exercise or solo training project. Each stag
 
 ## License
 MIT License
-

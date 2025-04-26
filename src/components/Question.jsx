@@ -4,21 +4,31 @@ import Option from './Option'
 const questions = [
   {
     id: 1,
+    type: 'multiple', // MULTIPLE CHOICE
     question: 'Which of the following are programming languages?',
     options: ['Python', 'Pizza', 'Java', 'Burger'],
     answer: ['Python', 'Java'],
   },
   {
     id: 2,
+    type: 'multiple', // MULTIPLE CHOICE
     question: 'Select the colors:',
     options: ['Red', 'Dog', 'Blue', 'Car'],
     answer: ['Red', 'Blue'],
   },
   {
     id: 3,
-    question: 'Select the fruits:',
-    options: ['Apple', 'Chair', 'Banana', 'Table'],
-    answer: ['Apple', 'Banana'],
+    type: 'truefalse', // TRUE/FALSE QUESTION
+    question: 'The Earth is flat.',
+    options: ['True', 'False'], // For consistency, options array
+    answer: 'False',
+  },
+  {
+    id: 4,
+    type: 'truefalse', // TRUE/FALSE QUESTION
+    question: 'JavaScript can run in the browser.',
+    options: ['True', 'False'],
+    answer: 'True',
   },
 ]
 
@@ -26,20 +36,28 @@ function Question() {
   const [selectedAnswers, setSelectedAnswers] = useState({})
   const [showResults, setShowResults] = useState(false)
 
-  const handleSelect = (questionId, option) => {
+  const handleSelect = (questionId, option, type) => {
     setSelectedAnswers((prev) => {
-      const prevSelected = prev[questionId] || []
-      if (prevSelected.includes(option)) {
-        // Deselect if already selected
-        return {
-          ...prev,
-          [questionId]: prevSelected.filter((item) => item !== option),
+      if (type === 'multiple') {
+        const prevSelected = prev[questionId] || []
+        if (prevSelected.includes(option)) {
+          // Deselect
+          return {
+            ...prev,
+            [questionId]: prevSelected.filter((item) => item !== option),
+          }
+        } else {
+          // Select new
+          return {
+            ...prev,
+            [questionId]: [...prevSelected, option],
+          }
         }
-      } else {
-        // Select new option
+      } else if (type === 'truefalse') {
+        // For true/false, only one selection allowed
         return {
           ...prev,
-          [questionId]: [...prevSelected, option],
+          [questionId]: option,
         }
       }
     })
@@ -49,11 +67,15 @@ function Question() {
     setShowResults(true)
   }
 
-  const checkCorrect = (questionId, correctAnswers) => {
-    const selected = selectedAnswers[questionId] || []
-    const sortedSelected = [...selected].sort()
-    const sortedCorrect = [...correctAnswers].sort()
-    return JSON.stringify(sortedSelected) === JSON.stringify(sortedCorrect)
+  const checkCorrect = (q) => {
+    const selected = selectedAnswers[q.id]
+    if (q.type === 'multiple') {
+      const sortedSelected = [...(selected || [])].sort()
+      const sortedCorrect = [...q.answer].sort()
+      return JSON.stringify(sortedSelected) === JSON.stringify(sortedCorrect)
+    } else if (q.type === 'truefalse') {
+      return selected === q.answer
+    }
   }
 
   return (
@@ -63,15 +85,21 @@ function Question() {
           <h2 className="text-xl font-semibold mb-4">{q.question}</h2>
           <div className="space-y-2">
             {q.options.map((option) => {
-              const isSelected = selectedAnswers[q.id]?.includes(option)
-              const isCorrect = q.answer.includes(option)
+              const isSelected =
+                q.type === 'multiple'
+                  ? selectedAnswers[q.id]?.includes(option)
+                  : selectedAnswers[q.id] === option
+              const isCorrect =
+                q.type === 'multiple'
+                  ? q.answer.includes(option)
+                  : q.answer === option
 
               return (
                 <Option
                   key={option}
                   text={option}
                   isSelected={isSelected}
-                  onClick={() => handleSelect(q.id, option)}
+                  onClick={() => handleSelect(q.id, option, q.type)}
                   showResult={showResults}
                   isCorrect={isCorrect}
                 />
@@ -79,10 +107,12 @@ function Question() {
             })}
             {showResults && (
               <p className="mt-2 text-sm">
-                {checkCorrect(q.id, q.answer) ? (
+                {checkCorrect(q) ? (
                   <span className="text-green-600">✅ Correct</span>
                 ) : (
-                  <span className="text-red-600">❌ Wrong (Correct: {q.answer.join(', ')})</span>
+                  <span className="text-red-600">
+                    ❌ Wrong (Correct Answer: {q.type === 'multiple' ? q.answer.join(', ') : q.answer})
+                  </span>
                 )}
               </p>
             )}
